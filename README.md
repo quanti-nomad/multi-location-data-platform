@@ -5,6 +5,7 @@ From manual Excel reporting to a certified, tested data platform, for a multi-lo
 This is a runnable, scaled-down version of a data platform I designed and built from scratch at a multi-location healthcare organization. Before it existed, every report was exported from the CRM and computed by hand in Excel. Everything here runs on **synthetic data** for a fictional two-brand clinic chain; no real company, patient or financial data is included.
 
 ![Certified KPIs by brand](docs/img/dashboard_preview.png)
+**Live dashboard:** [open the interactive dashboard](https://quanti-nomad.github.io/multi-location-data-platform/dashboard.html)
 
 ## Before and after
 
