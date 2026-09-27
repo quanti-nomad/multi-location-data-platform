@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: kpi_location_monthly
+    description: >
+      Certified KPI table, one row per location per open month. The single
+      source for executive, board and franchisee reporting. Column definitions
+      live in kpis/kpi_bible.yml.
+    config:
+      meta: {certified: true, tier: board, owner: "Data, Analytics & AI"}
+    data_tests:
+      - dbt_utils_free_unique_combo:
+          arguments: {columns: ["location_id", "month_start"]}
+    columns:
+      - name: location_id
+        data_tests: [not_null]
+      - name: month_start
+        data_tests: [not_null]
+      - name: net_revenue
+      - name: membership_revenue
+      - name: service_revenue
+      - name: appointments_scheduled
+      - name: completed_visits
+      - name: no_shows
+      - name: no_show_rate
+      - name: revenue_per_visit
+      - name: active_members
+      - name: new_members
+      - name: churned_members
+      - name: member_churn_rate
+      - name: leads
+      - name: converted_leads
+      - name: lead_conversion_rate

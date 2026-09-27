@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_crm__locations
+    description: One row per location, with cleaned names and brand ownership.
+    columns:
+      - name: location_id
+        data_tests: [unique, not_null]
+      - name: ownership
+        data_tests:
+          - accepted_values:
+              arguments: {values: ["corporate", "franchise"]}
+  - name: stg_crm__customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: is_test_account
+        description: Must never be null; a null flag silently drops customers from certified models.
+        data_tests: [not_null]
+  - name: stg_crm__appointments
+    description: Appointment statuses normalized from free-text spellings.
+    columns:
+      - name: appointment_id
+        data_tests: [unique, not_null]
+      - name: status
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: ["completed", "cancelled", "no_show"]}
+  - name: stg_crm__payments
+    description: Payment amounts parsed from text into integer cents.
+    columns:
+      - name: payment_id
+        data_tests: [unique, not_null]
+      - name: amount_cents
+        data_tests: [not_null]
+      - name: payment_type
+        data_tests:
+          - accepted_values:
+              arguments: {values: ["service", "membership", "refund"]}
+  - name: stg_crm__leads
+    columns:
+      - name: lead_id
+        data_tests: [unique, not_null]
+      - name: channel
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: ["paid_search", "paid_social", "referral", "organic", "walk_in"]}

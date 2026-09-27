@@ -1,0 +1,111 @@
+# KPI Bible
+# The single written definition of every metric used in executive, board and
+# franchisee reporting. A KPI is only "certified" when:
+#   1. it is defined here,
+#   2. its source model is certified in dbt (meta.certified: true), and
+#   3. its column exists in that model.
+# kpis/validate_kpis.py enforces all three on every pipeline run.
+
+version: 1
+default_owner: "Data, Analytics & AI"
+
+kpis:
+  - id: net_revenue
+    name: Net Revenue
+    definition: Settled sales and refunds for real customers, excluding voided payments and test accounts.
+    formula: sum(fct_payments.amount_cents) / 100
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: net_revenue
+    tier: board
+    unit: currency
+
+  - id: membership_revenue
+    name: Membership Revenue
+    definition: Net revenue from recurring membership charges.
+    formula: sum(amount_cents) where revenue_stream = 'membership'
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: membership_revenue
+    tier: board
+    unit: currency
+
+  - id: service_revenue
+    name: Service Revenue
+    definition: Net revenue from individual services, including refunds of those services.
+    formula: sum(amount_cents) where revenue_stream = 'service'
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: service_revenue
+    tier: executive
+    unit: currency
+
+  - id: active_members
+    name: Active Members
+    definition: Memberships active at any point in the month, including those that start or end in it.
+    formula: count(fct_membership_months rows)
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: active_members
+    tier: board
+    unit: count
+
+  - id: new_members
+    name: New Members
+    definition: Memberships whose start date falls in the month.
+    formula: count where is_new
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: new_members
+    tier: executive
+    unit: count
+
+  - id: member_churn_rate
+    name: Member Churn Rate
+    definition: Memberships ending in the month divided by memberships active at the start of the month.
+    formula: churned_members / (active_members - new_members)
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: member_churn_rate
+    tier: board
+    unit: percent
+
+  - id: completed_visits
+    name: Completed Visits
+    definition: Appointments with a completed status for real customers.
+    formula: count(fct_appointments) where status = 'completed'
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: completed_visits
+    tier: executive
+    unit: count
+
+  - id: no_show_rate
+    name: No-Show Rate
+    definition: No-show appointments divided by all scheduled appointments in the month.
+    formula: no_shows / appointments_scheduled
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: no_show_rate
+    tier: operational
+    unit: percent
+
+  - id: revenue_per_visit
+    name: Revenue per Visit
+    definition: Service revenue divided by completed visits. Membership revenue is excluded.
+    formula: service_revenue / completed_visits
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: revenue_per_visit
+    tier: operational
+    unit: currency
+
+  - id: lead_conversion_rate
+    name: Lead Conversion Rate
+    definition: Leads created in the month that became real customers, divided by all leads created in the month.
+    formula: converted_leads / leads
+    grain: location x month
+    source_model: kpi_location_monthly
+    column: lead_conversion_rate
+    tier: executive
+    unit: percent

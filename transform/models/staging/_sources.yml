@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: crm
+    description: Raw CRM tables, loaded as text by ingestion/extract_load.py. Never edited by hand.
+    schema: raw
+    tables:
+      - name: crm_locations
+      - name: crm_customers
+      - name: crm_services
+      - name: crm_memberships
+      - name: crm_appointments
+      - name: crm_payments
+      - name: crm_leads

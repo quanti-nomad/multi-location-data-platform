@@ -1,0 +1,77 @@
+version: 2
+
+# Certified models are the only tables reporting, KPIs and AI tools may read.
+# Every one carries an owner, a certification tier, and passing tests.
+
+models:
+  - name: dim_location
+    description: One row per location with brand and ownership (corporate or franchise).
+    config:
+      meta: {certified: true, tier: board, owner: "Data, Analytics & AI"}
+    columns:
+      - name: location_id
+        data_tests: [unique, not_null]
+      - name: location_name
+        data_tests: [unique, not_null]
+      - name: brand
+        data_tests:
+          - accepted_values:
+              arguments: {values: ["Vitality Clinics", "Lumen Wellness"]}
+
+  - name: dim_customer
+    description: One row per real customer. Duplicate records are merged and test accounts removed.
+    config:
+      meta: {certified: true, tier: executive, owner: "Data, Analytics & AI"}
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: home_location_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_location'), field: location_id}
+
+  - name: fct_appointments
+    description: One row per appointment for real customers, with a controlled status vocabulary.
+    config:
+      meta: {certified: true, tier: executive, owner: "Data, Analytics & AI"}
+    columns:
+      - name: appointment_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_customer'), field: customer_id}
+      - name: location_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_location'), field: location_id}
+
+  - name: fct_payments
+    description: Net revenue ledger. Settled sales and refunds; voids and test accounts excluded. Amounts in integer cents.
+    config:
+      meta: {certified: true, tier: board, owner: "Data, Analytics & AI"}
+    columns:
+      - name: payment_id
+        data_tests: [unique, not_null]
+      - name: amount_cents
+        data_tests: [not_null]
+      - name: location_id
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_location'), field: location_id}
+
+  - name: fct_membership_months
+    description: One row per membership per active calendar month.
+    config:
+      meta: {certified: true, tier: board, owner: "Data, Analytics & AI"}
+    data_tests:
+      - dbt_utils_free_unique_combo:
+          arguments: {columns: ["membership_id", "month_start"]}
+
+  - name: fct_leads
+    description: One row per lead with normalized channel and conversion flag.
+    config:
+      meta: {certified: true, tier: executive, owner: "Data, Analytics & AI"}
+    columns:
+      - name: lead_id
+        data_tests: [unique, not_null]
